@@ -10,7 +10,13 @@ import { Example1Service, ItemType } from './example-1.service';
   styleUrl: './example-1.component.css',
 })
 export class Example1Component implements OnInit {
+  
   items = signal<ItemType[]>([]);
+  loading = signal(false);
+
+  totalPrice = computed(() => {
+    return this.service.calculateTotalPrice(this.items());
+  });
 
   constructor(private service: Example1Service) {}
 
@@ -18,11 +24,11 @@ export class Example1Component implements OnInit {
     this.items.set(this.service.getItem());
   }
 
-  totalPrice = computed(() => {
-    return this.items().reduce((acc, curr) => acc + curr.price, 0);
-  });
-
   removeItem(item: ItemType) {
-    this.items.set([...this.service.removeItem(this.items(), item)]);
+    this.loading.set(true);
+    setTimeout(() => {
+      this.items.set([...this.service.removeItem(this.items(), item)]);
+      this.loading.set(false);
+    }, 3000);
   }
 }
